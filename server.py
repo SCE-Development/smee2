@@ -20,6 +20,12 @@ connected_clients = prometheus_client.Gauge(
     ["subscription_id"],
 )
 
+failed_connections = prometheus_client.Counter(
+    "failed_connections",
+    "Number of failed connection attempts to /tunnel",
+    ["subscription_id"],
+)
+
 clients = collections.defaultdict(list)
 
 subscribers = {}
@@ -49,6 +55,13 @@ async def webhook(subscription_id: str, request: Request):
     
 @app.websocket("/tunnel/{subscription_id}")
 async def websocket_endpoint(subscription_id: str, websocket: WebSocket):
+    api_key = websocket.headers.get("X-API-Key")
+    
+    if (api_key != "hello"):
+        failed_connections.labels(subscription_id).inc()
+        await websocket.close(code=1008)
+        return
+
     await websocket.accept()
     
     connected_clients.labels(subscription_id).inc()
@@ -62,7 +75,7 @@ async def websocket_endpoint(subscription_id: str, websocket: WebSocket):
     except Exception as e:
         connected_clients.labels(subscription_id).dec()
         clients[subscription_id].remove(websocket)
-
+    
         if not clients[subscription_id]:
             clients.pop(subscription_id, None)
             
