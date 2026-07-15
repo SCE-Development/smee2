@@ -82,7 +82,6 @@ async def websocket_endpoint(subscription_id: str, websocket: WebSocket):
         ).inc()
         connected_clients.labels(subscription_id).dec()
         clients[subscription_id].remove(websocket)
-    
         if not clients[subscription_id]:
             clients.pop(subscription_id, None)
             
