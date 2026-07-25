@@ -46,7 +46,7 @@ async def webhook(subscription_id: str, request: Request):
         
         logger.error("Data sent to websocket client")
         return {"message":"received"}  
-    
+    # something
     else:   
         logger.error("Invalid subscription '%s', connection not accepted", subscription_id)
         return
