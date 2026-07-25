@@ -63,3 +63,15 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/webhook -ContentType "
 ```
 
 The connected WebSocket client should receive the JSON payload.
+
+## on the real website
+```sh
+curl -X POST https://sce.sjsu.edu/webhook/asdf \
+  -H "X-API-Key: hello" \
+  -H "Content-Type: application/json" \
+  -d '{"message":"hello from webhook"}'
+
+websocat \
+  --header="X-API-Key:hello" \
+  - ws://sce.sjsu.edu/tunnel/asdf
+```
