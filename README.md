@@ -33,15 +33,26 @@ The server runs at `http://127.0.0.1:5000`.
 
 In one terminal, connect to the WebSocket tunnel:
 
-```powershell
-websocat ws://127.0.0.1:5000/tunnel
+```sh
+websocat ws://127.0.0.1:5000/tunnel/asdf
+
+# with an api key
+websocat \
+  --header="X-API-Key:hello" \
+  - ws://127.0.0.1:5000/tunnel/asdf
 ```
 
 In another terminal, send a webhook payload:
 
 ### bash
 ```sh
-curl -X POST http://127.0.0.1:5000/webhook \
+curl -X POST http://127.0.0.1:5000/webhook/asdf \
+  -H "Content-Type: application/json" \
+  -d '{"message":"hello from webhook"}'
+
+# with an api key
+curl -X POST http://127.0.0.1:5000/webhook/asdf \
+  -H "X-API-Key: hello" \
   -H "Content-Type: application/json" \
   -d '{"message":"hello from webhook"}'
 ```

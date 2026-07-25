@@ -34,6 +34,7 @@ async def webhook(subscription_id: str, request: Request):
     if subscription_id is not None:
         header_val = request.headers.get("X-API-Key")
         if (header_val != "hello"):
+            logger.error('/webhook recieved invalid X-API-Key of "%s"', header_val)
             raise HTTPException(status_code=403, detail="API key is not valid ")
 
         data = await request.json()
@@ -46,7 +47,6 @@ async def webhook(subscription_id: str, request: Request):
         
         logger.error("Data sent to websocket client")
         return {"message":"received"}  
-    # something
     else:   
         logger.error("Invalid subscription '%s', connection not accepted", subscription_id)
         return
@@ -57,6 +57,7 @@ async def websocket_endpoint(subscription_id: str, websocket: WebSocket):
     api_key = websocket.headers.get("X-API-Key")
     
     if (api_key != "hello"):
+        logger.error('/tunnel recieved invalid X-API-Key of "%s"', api_key)
         MetricsHandler.failed_connections.labels(
             subscription_id=subscription_id,
             reason="bad_api_key",
@@ -76,12 +77,14 @@ async def websocket_endpoint(subscription_id: str, websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             await websocket.send_text("Message received")
-    except Exception as e:
+    except Exception:
+        logger.exception('ok')
         MetricsHandler.failed_connections.labels(
             subscription_id=subscription_id,
             reason="websocket_receive_failed",
         ).inc()
         MetricsHandler.connected_clients.labels(subscription_id).dec()
+    finally:
         clients[subscription_id].remove(websocket)
         if not clients[subscription_id]:
             clients.pop(subscription_id, None)
@@ -104,8 +107,9 @@ def get_metrics():
 # metrics_handler referenced by the rest of the file. otherwise,
 # the thread interacts with an instance different than the one the
 # server uses
+logger.error("!!!!!`")
 if __name__ == "server":
     MetricsHandler.init()
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="0.0.0.0", port=5000)
+    uvicorn.run("server:app", host="0.0.0.0", port=5000, reload=True, timeout_graceful_shutdown=1)
