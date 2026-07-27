@@ -3,6 +3,10 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    volumes:
+      - ./config.yml:/app/config.yml
+    command:
+        - --config=/app/config.yml
 
 networks:
   default:

@@ -65,6 +65,22 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/webhook -ContentType "
 The connected WebSocket client should receive the JSON payload.
 
 ## on the real website
+create an file called `config.yml` with content like
+```yml
+api_key: thesecretofalltime
+```
+run the server with
+```sh
+docker-compose up --build -d
+```
+
+if you wanna see logs
+```sh
+docker logs smee2-smee2-1 --tail 300 -f
+```
+
+to test that its working, use the same api key like:
+
 ```sh
 curl -X POST https://sce.sjsu.edu/webhook/asdf \
   -H "X-API-Key: hello" \
