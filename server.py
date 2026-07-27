@@ -59,7 +59,7 @@ async def webhook(subscription_id: str, request: Request):
         await client.send_json(data)
 
     number_of_clients = len(clients.get(subscription_id, []))
-    message = f"forwarded to {len(number_of_clients)} client(s) for subscription {subscription_id}"
+    message = f"forwarded to {number_of_clients} client(s) for subscription {subscription_id}"
     logger.debug(message)
     return {"message": message}
 

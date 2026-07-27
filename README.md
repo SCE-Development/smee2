@@ -83,11 +83,10 @@ to test that its working, use the same api key like:
 
 ```sh
 curl -X POST https://sce.sjsu.edu/webhook/asdf \
-  -H "X-API-Key: hello" \
   -H "Content-Type: application/json" \
   -d '{"message":"hello from webhook"}'
 
 websocat \
   --header="X-API-Key:hello" \
-  - ws://sce.sjsu.edu/tunnel/asdf
+  - wss://sce.sjsu.edu/tunnel/asdf
 ```
