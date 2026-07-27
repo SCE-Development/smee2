@@ -8,7 +8,8 @@ def get_args():
         "-v",
         action="count",
         default=0,
-        help="increase logging verbosity; can be used multiple times"
+        help="increase logging verbosity; can be used multiple times like -vvv"
     )
+    parser.add_argument("--config", help="path to yaml file for api key, see readme")
 
     return parser.parse_args()
