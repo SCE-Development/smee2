@@ -14,7 +14,7 @@ def get_args():
     parser.add_argument(
     "--pushgateway-url",
     default="http://127.0.0.1:9091",
-    help="URL of the Prometheus Pushgateway"
+    help="URL of the Prometheus Pushgateway. Defaults to http://127.0.0.1:9091"
     )
 
     return parser.parse_args()
