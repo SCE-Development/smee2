@@ -11,4 +11,10 @@ def get_args():
         help="increase logging verbosity; can be used multiple times"
     )
 
+    parser.add_argument(
+    "--pushgateway-url",
+    default="http://127.0.0.1:9091",
+    help="URL of the Prometheus Pushgateway. Defaults to http://127.0.0.1:9091"
+    )
+
     return parser.parse_args()

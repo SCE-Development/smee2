@@ -1,8 +1,8 @@
 import collections
 import logging
 
-from fastapi import FastAPI, WebSocket, Request, HTTPException, Response
-import prometheus_client
+from fastapi import FastAPI, WebSocket, Request, HTTPException
+
 import uvicorn
 
 from args import get_args
@@ -60,12 +60,14 @@ async def websocket_endpoint(subscription_id: str, websocket: WebSocket):
             subscription_id=subscription_id,
             reason="bad_api_key",
         ).inc()
+        MetricsHandler.push(args.pushgateway_url)
         await websocket.close(code=1008)
         return
 
     await websocket.accept()
     
     MetricsHandler.connected_clients.labels(subscription_id).inc()
+    MetricsHandler.push(args.pushgateway_url)
     
     clients[subscription_id].append(websocket)
 
@@ -80,7 +82,9 @@ async def websocket_endpoint(subscription_id: str, websocket: WebSocket):
             subscription_id=subscription_id,
             reason="websocket_receive_failed",
         ).inc()
+        MetricsHandler.push(args.pushgateway_url)
         MetricsHandler.connected_clients.labels(subscription_id).dec()
+        MetricsHandler.push(args.pushgateway_url)
         clients[subscription_id].remove(websocket)
         if not clients[subscription_id]:
             clients.pop(subscription_id, None)
@@ -88,12 +92,7 @@ async def websocket_endpoint(subscription_id: str, websocket: WebSocket):
         logger.debug(f"Websocket connection disconnected at id: {subscription_id}")
             
 
-@app.get("/metrics")
-def get_metrics():
-    return Response(
-        content=prometheus_client.generate_latest(),
-        media_type="text/plain",
-    )
+
 
 # we have a separate __name__ check here due to how FastAPI starts
 # a server. the file is first ran (where __name__ == "__main__")
